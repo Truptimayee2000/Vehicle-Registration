@@ -17,7 +17,7 @@ This project is a web-based dashboard application to analyze and visualize vehic
 
 ## Requirements
 
-- Python 3.7 or higher
+- Python 3.4 or higher
 - PostgreSQL database
 
 ---
@@ -27,8 +27,8 @@ This project is a web-based dashboard application to analyze and visualize vehic
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/Truptimayee2000/Vehicle-Registration.git
-cd Vehicle-Registration
+    git clone https://github.com/Truptimayee2000/Vehicle-Registration.git
+    cd Vehicle-Registration
 ```
 
 2. Install Miniconda (if not already installed):
@@ -38,7 +38,7 @@ Download and install Miniconda from https://docs.conda.io/en/latest/miniconda.ht
 3. Create a new Conda environment:
 
 ```bash
-    conda create -n vehicle_dashboard python=3.9 -y
+    conda create -n vehicle_dashboard python=3.4 -y
     
 ```
 4. Activate the Conda environment:

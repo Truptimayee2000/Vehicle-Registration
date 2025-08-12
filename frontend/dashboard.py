@@ -23,14 +23,14 @@ st.markdown("""
     font-weight: bold;
     color: #0f4c81;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   /* KPI Card container */
   .kpi-card {
     background-color: #fff9f0;
     border-radius: 12px;
-    padding: 15px 10px;
+    padding: 5px 5px;
     text-align: center;
     box-shadow: 0 6px 18px rgba(15, 76, 129, 0.1);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -86,7 +86,6 @@ st.markdown("""
 
 st.title("🚗📈 Vehicle Growth Dashboard")
 
-# --- Fetch Filter Options ---
 @st.cache_data
 def fetch_filter_options():
     try:
@@ -99,7 +98,6 @@ def fetch_filter_options():
 
 filters = fetch_filter_options()
 
-# --- Sidebar Filters ---
 with st.sidebar:
     st.header("🔍 Filters")
     category = st.selectbox(
@@ -121,7 +119,6 @@ if category != "All":
 if manufacturer != "All":
     params["manufacturer"] = manufacturer
 
-# --- Fetch Data from API ---
 try:
     response = requests.get(API_URL, params=params)
     data = response.json()
@@ -129,7 +126,6 @@ except Exception as e:
     st.error(f" API request failed: {e}")
     st.stop()
 
-# --- Display Data ---
 if data and "monthly" in data:
     df_monthly = pd.DataFrame(data['monthly'])
     df_quarterly = pd.DataFrame(data['quarterly'])
@@ -137,23 +133,34 @@ if data and "monthly" in data:
     if not df_monthly.empty:
         latest = df_monthly.iloc[-1]
 
-        # KPI Cards
+  
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown('<div class="kpi-card"><div class="metric-label">Latest Monthly Count</div>'
+            st.markdown('<div class="kpi-card" style="padding-top: 10px"><div class="metric-label">Latest Monthly Count</div>'
                         f'<div class="metric-value">{latest["count"]:,}</div>'
                         f'<div>{latest.get("mom_growth_%", 0):.2f}% MoM</div></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown('<div class="kpi-card"><div class="metric-label">YoY Growth</div>'
-                        f'<div class="metric-value">{latest.get("yoy_growth_%", 0):.2f}%</div></div>', unsafe_allow_html=True)
+                yoy_growth = latest.get("yoy_growth_%", 0)
+                arrow = "▲" if yoy_growth >= 0 else "▼"
+                arrow_color = "#0b6b34" if yoy_growth >= 0 else "#9b1c1c"
+
+                st.markdown(f"""
+                    <div class="kpi-card" style="padding: 20px">
+                        <div class="metric-label">YoY Growth</div>
+                        <div class="metric-value">
+                            <span style="color:{arrow_color}; font-weight:bold;">{arrow}</span>
+                            {yoy_growth:.2f}%
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+
         with col3:
-            st.markdown('<div class="kpi-card"><div class="metric-label">Filters</div>'
+            st.markdown('<div class="kpi-card" style="padding-top: 5px"><div class="metric-label">Filters</div>'
                         f'<div class="metric-value">{category if category != "All" else "All Categories"}, '
                         f'{manufacturer if manufacturer != "All" else "All Manufacturers"}</div></div>', unsafe_allow_html=True)
 
         st.markdown("---")
 
-        # Monthly Chart
         df_monthly['date'] = pd.to_datetime(df_monthly['date'])
         with st.expander("📅 Monthly Trends", expanded=True):
             base = alt.Chart(df_monthly).encode(x='date:T')
@@ -174,7 +181,6 @@ if data and "monthly" in data:
             chart = alt.layer(bar_count, line_mom, line_yoy).resolve_scale(y='independent').interactive()
             st.altair_chart(chart, use_container_width=True)
 
-        # Quarterly Chart
         if not df_quarterly.empty:
             df_quarterly['quarter_label'] = df_quarterly['year'].astype(str) + ' Q' + df_quarterly['quarter'].astype(str)
             with st.expander("📆 Quarterly Trends", expanded=False):
