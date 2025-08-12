@@ -1,0 +1,8 @@
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+psycopg2-binary
+pandas
+streamlit
+altair
+requests
